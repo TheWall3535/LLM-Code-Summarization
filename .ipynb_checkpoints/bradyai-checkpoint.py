@@ -5,6 +5,9 @@ from tenacity import (
     stop_after_attempt,
     wait_random_exponential
 )
+import nltk
+import numpy as np
+import time 
 
 class dictionary(dict):
     def __init__(self):
@@ -47,12 +50,8 @@ class CodeSummarizer(openai.ChatCompletion):
         self.examples = self.__get_examples()
         self.prompt_length = prompt_length
         # DRAFTING
-<<<<<<< Updated upstream
-        self.running_summary = ''
-=======
         self.summaries = None
         self.running_summary = None
->>>>>>> Stashed changes
 
     def __get_examples(self):
         if self.language.lower() == 'qlikview':
@@ -72,13 +71,6 @@ class CodeSummarizer(openai.ChatCompletion):
     def __completion_with_backoff(**kwargs):
         return self.create(**kwargs)
 
-<<<<<<< Updated upstream
-    def summarize(self, Chunk, temperature = 1.0, logit_bias = {}, n = 3):
-        self.create(engine = self.AZURE_MODEL_NAME,
-                                              messages = [{"role": "system", "content" : "You are giving step by step low level detail of Qlikview codes so that developers will not have to reference the source code after reading your response."},
-            {"role": "user", "content": f"Be extremely specific about any conditions that are in the code. \n code:\n```\n {self.examples['input']} \n```\n"},
-            {"role": "assistant", "content" : f"{self.examples['output']}"},
-=======
 
     # returns a list of generated summaries from a single chunk of code
     def __get_candidate_summaries(self, Chunk, temperature = 1.0, logit_bias = {}, n = 3):
@@ -86,30 +78,13 @@ class CodeSummarizer(openai.ChatCompletion):
                                               messages = [{"role": "system", "content" : f"You are giving step by step low level detail of {self.language} codes so that developers will not have to reference the source code after reading your response."},
             {"role": "user", "content": f"Be extremely specific about any conditions that are in the code. \n code:\n```\n {self.examples['low_level_input']} \n```\n"},
             {"role": "assistant", "content" : f"{self.examples['low_level_output']}"},
->>>>>>> Stashed changes
             {"role": "user", "content": f"Be extremely specific about any conditions that are in the code.  \n code:\n```\n {Chunk} \n```\n"}
                 ],
                                               max_tokens = (self.max_tokens - (self.count_tokens(Chunk) + self.count_tokens(self.examples['low_level_input']) + self.count_tokens(self.examples['low_level_output']))),
         temperature = temperature,
         logit_bias = logit_bias,
-        n = 3)
+        n = n)
 
-<<<<<<< Updated upstream
-        # pick the best summary
-        Bleu...
-
-
-        # update the running summary
-        call to another method
-        self.running_summary += winning_summary
-
-        return winning_summary, 
-
-    def update_running_summary(self):
-
-
-        
-=======
         return [choice['message']['content'] for choice in summaries['choices']]
 
     # takes a summary, and outputs generated code for each summary
@@ -204,4 +179,3 @@ class CodeSummarizer(openai.ChatCompletion):
        
 
     
->>>>>>> Stashed changes
