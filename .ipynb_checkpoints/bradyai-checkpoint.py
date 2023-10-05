@@ -160,8 +160,8 @@ class CodeSummarizer(openai.ChatCompletion):
         else:
             updated_summary = self.create(engine = self.AZURE_MODEL_NAME,
                                               messages = [{"role": "system", "content" : f"You are creating a high level summary, from low level summaries of {self.language} codes."},
-            {"role": "user", "content": f"Update the existing high level summary, with the following low level summary  {self.examples['hi_level_input']}"},
-            {"role": "assistant", "content" : f"{self.examples['hi_level_output']}"},
+            {"role": "user", "content": f"Update the existing high level summary, with the following low level summary  {self.examples['high_level_input']}"},
+            {"role": "assistant", "content" : f"{self.examples['high_level_output']}"},
             {"role": "user", "content": f"Update the existing high level summary, with the following low level summary \n High Level Summary:\n```\n {self.running_summary} \n```\n Low Level Summary:\n```\n {summary} \n```\n"}
                 ],
                                               max_tokens = (self.max_tokens - (self.count_tokens(self.running_summary))),
