@@ -1,0 +1,3 @@
+The key field is loaded in from the Entity_Regional qvd where the first level, Entity.Lvl_One, equals 'Americas & Asia'.  
+Then, two years of transactional data from the GLPCA qvd is loaded only for entity keys that already exist in the data that relate to American or Asian entities. 
+Key fields, customer sales, and customer rebates are included in the GLCPA load.

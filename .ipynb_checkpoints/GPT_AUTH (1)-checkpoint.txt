@@ -1,0 +1,6 @@
+AZURE_MODEL_NAME brady-gpt-35-turbo-16k
+MODEL gpt-3.5-turbo-16k
+OPENAI_API_BASE https://cog-5vocjn5ijgmsu.openai.azure.com/
+OPENAI_API_KEY f0e667392e404586ba4650512091be00
+OPENAI_API_VERSION 2023-03-15-preview
+API_TYPE azure

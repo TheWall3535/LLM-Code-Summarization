@@ -1,0 +1,399 @@
+﻿///$tab Main
+SET ThousandSep=',';
+SET DecimalSep='.';
+SET MoneyThousandSep=',';
+SET MoneyDecimalSep='.';
+SET MoneyFormat='$#,##0.00;($#,##0.00)f';
+SET TimeFormat='h:mm:ss TT';
+SET DateFormat='M/D/YYYY';
+SET TimestampFormat='M/D/YYYY h:mm:ss[.fff] TT';
+SET MonthNames='Jan;Feb;Mar;Apr;May;Jun;Jul;Aug;Sep;Oct;Nov;Dec';
+SET DayNames='Mon;Tue;Wed;Thu;Fri;Sat;Sun';
+
+EXECUTE G:\01.Repository\15.GOOGLE\EXTRACTOR\gDocXTractor.exe -file 'Salesdoctype';
+
+///$tab Order_Item
+Let vNumYears = 2;
+
+For i = 0 to $(vNumYears)                
+Let vYear = year(addmonths(today(), 5));
+Let vYear = vYear - i;
+
+
+
+Fact:
+LOAD 
+[Sales Document_VBELN] as [Sales document_VBELN],
+[Description_ARKTX] as [Description],
+[Billing block_FAKSP] as [Billing Block1],
+[Billing block_FAKSK] as [Billing Block2],
+BILLTCT as [%KEY_CONTACT_BILL_TO],
+[Purchase order type_BSARK] as [%KEY_PO_TYPE],
+[PO number_BSTKD] as [PO Number],
+BUYERCT as [%KEY_CONTACT_SOLD_TO],
+[Paym.card plan no._RPLNR],
+[Overall CreditStatus_CMGST] ,
+[Order Quantity_KWMENG] as [Doc Order Qty],
+[Special Pricing Code_IHREZ_E] as [Special Pricing Code_IHREZ_E],
+[Created by_L_ERNAM] as [Created By],
+[Created on_L_ERDAT] as [Line System Date],
+[Configuration_CUOBJ] as [Configuration_CUOBJ],
+[Shipping Strategy_KVGR5] as [Shipping Strategy],
+[Delivery block_LIFSK] as [Delivery Block],
+[Distribution Channel_VTWEG] as [%KEY_DISTRIBUTION_CHANNEL],
+[Division_L_SPART] as [%KEY_DIVISION],
+[Document Currency_L_WAERK] as [Document currency_WAERK],
+[Document Date_AUDAT] as [Header Local Date],
+[Sales Document_VBELN] as %KEY_VBAK,
+[%KEY_VBAP] as [%KEY_VBAP],
+[Sales Document Type_AUART] as [Sales Document Type],
+[FORWAGENT] as [%KEY_CARRIER],
+[Created by_H_ERNAM] as [Created By Header],
+[Created on_H_ERDAT] as [Header System Date],
+[Incoterms_INCO1] as [Inco Terms 1],
+[Incoterms parte 2_INCO2] as [Inco Terms 2],
+[Item category_PSTYV] as [SD Item Category],
+[Key Code_VSNMR_V] as [Key Code_VSNMR_V],
+[Delivery block stat._LSSTA] as [Delivery Block Status],
+[Over. dlv. blk stat._LSSTK] as [Overall Delivery Block Status],
+[Material entered_MATWA] as [Material Entered],
+[Material_MATNR] as [%KEY_MATERIAL],
+[Net value_L_NETWR] as [Doc_Curr_Net_Value],
+[Order reason_AUGRU] as [%KEY_ORDER_REASON],
+[PAYER] as [%KEY_PAYER],
+[Plant_WERKS] as [%KEY_PLANT],
+[Preceding doc.categ._VGTYP] as [Prec Doc Cat Line],
+[Preceding doc.categ._VGTYP] as [Prec Doc Cat Header],
+[Reason for rejection_ABGRU] as [%KEY_REJECTION_REASON],
+[Reference document_VGBEL] as [Reference Document],
+[Reference item_VGPOS] as [Reference Document Item],
+[REQUIC] as [%KEY_CONTACT_REQ],
+[Sales Document Item_POSNR] as [Sales Document Item],
+[Sales deal_KNUMA_AG] as [Sales Deal],
+[Sales Organization_VKORG] as [%KEY_SALES_ORG],
+[Shipping Point/Receiving Pt_VSTEL] as [Shipping Point],
+[SHIP_TO] as [%KEY_SHIP_TO],
+[SHIPTCT] as [%KEY_CONTACT_SHIP_TO],
+[Sales Team_ZZ_IN_SALES_TEAM] as [Sales Team_ZZ_IN_SALES_TEAM],
+[Sales Team_ZZSALESTEAM1] as [Sales Team_ZZSALESTEAM1],
+[SOLD_TO] as [%KEY_SOLD_TO],
+[Subtotal 2_KZWI2] as [Doc_Curr_Discount_Amount],
+[Subtotal 4_KZWI4] as [Doc_Curr_Product_Amount],
+[Subtotal 5_KZWI5] as [Doc_Curr_Freight_Amount],
+[Tax amount_MWSBP] as [Doc_Curr_Tax_Amount],
+[Underdel. Tolerance_UNTTO] as [Underdel. tolerance_UNTTO],
+[_ZZXSELLAMT] as [Doc_Curr_Crosssell_Amount],
+[Cross Sell Type_ZZXSELLTYP] as [Cross-Sell Type],
+[ZDTRDLRZH] as [%KEY_DISTRIBUTOR],
+[Overall status_GBSTA] as [Overall status_GBSTA],
+[Item create date_ZZ_ITMCRTDT] as [%KEY_DATE],
+[Website_ZZ_WEBSITE] as [Website],
+[Contact Person_ZZ_BUYER] as [%KEY_CONTACT],
+[%KEY_SALESORG_DISTR_DIV],
+[Person Responsible_ZZ_ERNAM] as [Person Responsible],
+[Department Responsible_KVGR4] as [Department Responsible Code],
+[Payment card type_CCINS] as [Payment Card Type],
+[Delivery status_LFSTA] as [Delivery status Code],
+ZE_ENDUSR as [End User #],
+[Customer Material_KDMAT] as [Customer Material],
+[Changed on_AEDAT] as [Line Changed On Date],
+[Quotation valid from_ANGDT]	,
+[Quotation valid to_BNDDT]	,
+[Cost_WAVWR],
+[Delivery block_ZZ_ORG_BLCK] as [Delivery Block Header],
+FORWAGENT as %KEY_LFA1,
+Segment_Date,
+Name_BNAME as Name_BNAME_Temp,
+[Cost Center_H_KOSTL] as [Cost Center],
+GATransactionID ,
+ZZ_REASON as [Line Item Reason #],
+[OI_Profit_Center],
+[OCR Batch ID],
+[Software Key Exp Date],
+[Purchase order date_BSTDK] as [Purchase Order Date]
+FROM
+[\\etl.ebi.insidebrady.com\repository$\04.TRANSACTION\ORDER_ITEM\DATA\SEGMENTS\ORDER_ITEM_FY_$(vYear).qvd] 
+//[G:\01.Repository\04.TRANSACTION\ORDER_ITEM\DATA\SEGMENTS\ORDER_ITEM_FY_$(vYear).qvd]
+(qvd)
+;
+Next
+
+inner join (Fact)
+LOAD Type as [Sales Document Type], 
+     Flag, 
+     Sign,
+     If(Flag='Orders' or Flag='Credits&Returns' or Flag='Inquiry' or Flag='Rebates' ,1,0) as Flag_OrdersType
+FROM
+[\\etl.ebi.insidebrady.com\repository$\15.GOOGLE\RAW\Standards\App_Config\Salesdoctype.xlsx]
+(ooxml, embedded labels, table is Sheet1);
+
+ 
+// Left join (Fact)
+// LOAD %KEY_VBAP, 
+     // GATransactionID 
+// FROM
+// G:\01.Repository\30.LOGICAL_LAYER\03.DIMENSIONS\GATransactionID\DATA\GATransactionID.qvd (qvd)
+// where exists(%KEY_VBAP);
+
+
+
+
+
+///$tab Main 4
+
+mapSurvivor:
+MAPPING
+LOAD DISTINCT
+ 	 %KEY_ZSCACTS, 
+ 	 [Customer_SURVIVOR]
+FROM [\\etl.ebi.insidebrady.com\repository$\03.MASTER\Survivor\DATA\ZSCACTS.qvd] (qvd);
+
+MAP_TVBST_OverallStatusDesc:
+mapping
+LOAD  
+  if(len(trim(Status_STATU)) =0,'ABCD',Status_STATU) as [status code],
+  Status_STATU &'-'& Description_BEZEI  as [status code desc]
+FROM
+[\\etl.ebi.insidebrady.com\repository$\03.MASTER\PROCESS_STATUS\DATA\TVBST.qvd]
+(qvd) where [Language Key_SPRAS]='E' and [Table name_TBNAM]='VBUK' and [Field name_FDNAM]= 'CMGST';
+
+
+MAP_TVBST_DeliveryStatusDesc:
+mapping
+LOAD  
+  if(len(trim(Status_STATU)) =0,'ABCD',Status_STATU) as [status code],
+  Status_STATU &'-'& Description_BEZEI  as [status code desc]
+FROM
+[\\etl.ebi.insidebrady.com\repository$\03.MASTER\PROCESS_STATUS\DATA\TVBST.qvd]
+(qvd) where [Language Key_SPRAS]='E' and [Table name_TBNAM]='VBUP' and [Field name_FDNAM]= 'LFSTA';
+
+
+MAP_TVV4T_DeptRespDesc:
+mapping
+LOAD  
+  if(len(trim([Department Responsible_KVGR4])) =0,'ABCD',[Department Responsible_KVGR4]) as [status code],
+  [Department Responsible_KVGR4] &'-'& [Description_BEZEI]  as [status code desc]
+FROM
+[\\etl.ebi.insidebrady.com\repository$\02.CONFIG\DEPT_RESPONSIBLE\DATA\TVV4T.qvd]
+(qvd) where [Language Key_SPRAS]='E';
+
+
+
+/* Temp_Map_WPSNA:
+LOAD 
+%KEY_VBAK
+FROM
+[\\etl.ebi.insidebrady.com\repository$\04.TRANSACTION\FACT_ORDER\DATA\SEGMENTS\SF_WPSNA_CCOrder_FY_*.qvd]
+(qvd);
+
+Map_WPSNA:
+mapping LOAD 
+%KEY_VBAK as %KEY_VBAK_WPS,
+'Yes' as ID_GATransaction
+resident Temp_Map_WPSNA;
+drop table Temp_Map_WPSNA; */
+
+
+
+
+
+///$tab Main 4
+
+
+left Join (Fact)
+LOAD Distinct %KEY_VBAP, 
+[Sales document_VBELN] as [Sales Document],
+%KEY_PLANT as Plant.Number,
+%KEY_SALES_ORG as SalesOrg.Number,
+Flag as TransactionType,
+text([Sales Team_ZZ_IN_SALES_TEAM]) as %KEY_SALES_TEAM_IN,
+     text( [Sales Team_ZZSALESTEAM1]) as %KEY_SALES_TEAM,
+%KEY_MATERIAL &'/'&  %KEY_SALES_ORG &'/'& %KEY_DISTRIBUTION_CHANNEL as %KEY_MVKE, 
+     if([Document currency_WAERK]='RGT','MYR',if([Document currency_WAERK]='BAHT','BHT',[Document currency_WAERK])) as %KEY_CURRNECY_BUDGET_CONVERSION,
+     if([Overall CreditStatus_CMGST]='','No',if([Overall CreditStatus_CMGST]=' ','No',if([Overall CreditStatus_CMGST]='A','No',if([Overall CreditStatus_CMGST]='D','No','Yes')))) as OnCreditReview,
+ApplyMap('MAP_TVBST_OverallStatusDesc', if(len(trim([Overall CreditStatus_CMGST])) =0,'ABCD',[Overall CreditStatus_CMGST]),null()) as [Overall Credit Status Desc],
+ApplyMap('MAP_TVBST_DeliveryStatusDesc', if(len(trim([Delivery status Code])) =0,'ABCD',[Delivery status Code]),null()) as [Delivery status Code Desc],
+ApplyMap('MAP_TVV4T_DeptRespDesc', if(len(trim([Department Responsible Code])) =0,'ABCD',[Department Responsible Code]),null()) as [Department Responsible Code Desc],
+     if(isnull(trim([Overall CreditStatus_CMGST])),' ',[Overall CreditStatus_CMGST]) as [Overall Credit Status],
+   if(isnull(%KEY_REJECTION_REASON) or trim(%KEY_REJECTION_REASON)='','No','Yes') as Rejected,
+     // if(isnull(%KEY_REJECTION_REASON) or trim(%KEY_REJECTION_REASON)='','Active Lines','Rejected Lines') as OrdersType,
+ //  if(%KEY_REJECTION_REASON=23,'Yes',if(%KEY_REJECTION_REASON=70,'Yes',if(%KEY_REJECTION_REASON=60,'Yes',if(%KEY_REJECTION_REASON=62,'Yes',if(%KEY_REJECTION_REASON=63,'Yes',if(%KEY_REJECTION_REASON=22,'Yes',if(%KEY_REJECTION_REASON=80,'Yes',if(%KEY_REJECTION_REASON=26,'Yes',if(%KEY_REJECTION_REASON=41,'Yes',if(%KEY_REJECTION_REASON=37,'Yes',if(%KEY_REJECTION_REASON=10,'Yes',if(%KEY_REJECTION_REASON=61,'Yes',if(%KEY_REJECTION_REASON=64,'Yes',if(%KEY_REJECTION_REASON=04,'Yes',if(%KEY_REJECTION_REASON=86,'Yes',if(%KEY_REJECTION_REASON=87,'Yes',if(%KEY_REJECTION_REASON=88,'Yes',if(%KEY_REJECTION_REASON=93,'Yes',if(%KEY_REJECTION_REASON=95,'Yes','No'))))))))))))))))))) as [QuoteRejected],
+	if(MATCH(%KEY_REJECTION_REASON, 4,10,22,23,26,37,41,60,61,62,63,64,70,80,86,87,88,93,95),'Yes','No') as [QuoteRejected],
+	
+//	ZE_USER_TEMP &'-'& ZE_EndUser_Name  as ZE_ENDUSR,
+[End User #]&'/'&%KEY_SALES_ORG&'/'&%KEY_DISTRIBUTION_CHANNEL&'/'&%KEY_DIVISION as %KEY_ZE_END_USER_INDUSTRY,
+	
+	// Moved below from Data model
+	%KEY_SOLD_TO&'/'&%KEY_SALESORG_DISTR_DIV as SoldTo.IndustryCode_Key,
+	%KEY_PAYER&'/'&%KEY_SALESORG_DISTR_DIV as Payer.IndustryCode_Key,
+	%KEY_SHIP_TO&'/'&%KEY_SALESORG_DISTR_DIV as ShipTo.IndustryCode_Key,
+	[Special Pricing Code_IHREZ_E]&'/'&%KEY_SALESORG_DISTR_DIV as CPN_Code,
+	%KEY_SALESORG_DISTR_DIV&'/'&%KEY_SOLD_TO as %KEY_ZSDSLST_KEY,
+	//had reverse the sign to get original values... check if required at all..
+	 Doc_Curr_Net_Value*Sign as [Net Value], 
+	 Doc_Curr_Discount_Amount*Sign as [Discount Amount],
+	 Doc_Curr_Product_Amount*Sign as [Product Amount],
+	 Doc_Curr_Freight_Amount*Sign as [Freight Amount],
+	 Doc_Curr_Tax_Amount*Sign as [Tax Amount],
+	 //Order_Amount*Sign as Doc_Curr_Order_Amount,
+	 if(Flag = 'Orders',Doc_Curr_Net_Value) as [Order Net Value],
+ 	 if(Flag = 'Quotes',Doc_Curr_Net_Value) as Quote_Net_Value,
+ 	 if(Flag = 'Credits&Returns',Doc_Curr_Net_Value) as [Return Net Value],  
+ 	 if(Flag = 'Rebates',Doc_Curr_Net_Value) as [Rebate Net Value],
+	 Doc_Curr_Crosssell_Amount*Sign as [Cross-Sell Amount],
+	 [Doc Order Qty]*Sign as [Order Qty],
+	( Doc_Curr_Net_Value /[Doc Order Qty] ) as [Unit Net Value], 
+	 ([Doc Order Qty]- ( [Doc Order Qty]*([Underdel. tolerance_UNTTO]/100)))*Sign as [tolerance Order Qty],
+	%KEY_PAYER&'/'&%KEY_SALES_ORG&'/'&%KEY_DISTRIBUTION_CHANNEL AS %KEY_PAYER_SALES_AREA,
+	 %KEY_SHIP_TO&'/'&%KEY_SALES_ORG&'/'&%KEY_DISTRIBUTION_CHANNEL AS %KEY_SHIP_TO_SALES_AREA,
+	 %KEY_SOLD_TO&'/'&%KEY_SALES_ORG&'/'&%KEY_DISTRIBUTION_CHANNEL AS %KEY_SOLD_TO_SALES_AREA,
+  %KEY_PAYER&'/'&%KEY_SALES_ORG&'/'&%KEY_DISTRIBUTION_CHANNEL as %KEY_MASTER_PAYER,
+  %KEY_PAYER&'/'&%KEY_SALES_ORG&'/'&%KEY_DISTRIBUTION_CHANNEL &'/'& %KEY_DIVISION AS %KEY_PAYER_ZSCUSR,
+  %KEY_SOLD_TO&'/'&%KEY_SALES_ORG&'/'&%KEY_DISTRIBUTION_CHANNEL &'/'& %KEY_DIVISION AS  %KEY_SOLDTO_ZSCUSR,
+    applymap('mapSurvivor',  %KEY_SOLD_TO, %KEY_SOLD_TO) &'/'& %KEY_SALES_ORG &'/'& %KEY_DISTRIBUTION_CHANNEL &'/'& %KEY_DIVISION as %KEY_ZSCUSR02_SOLDTO_SURVIVOR,
+	applymap('mapSurvivor',  %KEY_PAYER, %KEY_PAYER)&'/'&%KEY_SALES_ORG&'/'&%KEY_DISTRIBUTION_CHANNEL&'/'&%KEY_DIVISION AS %KEY_PAYER_ZSCUSR_SURVIVOR,
+	  
+	  %KEY_SALES_ORG&'/'&%KEY_SOLD_TO&'/'&%KEY_DIVISION as %KEY_MANAGE_GROUP,
+	  %KEY_SALES_ORG&'/'&%KEY_PAYER&'/'&%KEY_DIVISION as %KEY_PAYER_MANAGE_GROUP,
+	  if(ltrim(rtrim([Paym.card plan no._RPLNR]))<>'' , 'Payment Card' , [Paym.card plan no._RPLNR] ) as [PAYMENT CARD],
+	  if([Sales Document Type]='ZI', [Cost_WAVWR])*Sign as Doc_Curr_ZI_Amount,
+	  if([Sales Document Type] = 'ZI' ,replace(ltrim( replace([Cost Center] ,0,' ' )),' ',0)) as [ZI Cost Center],
+	  if(len(trim(Name_BNAME_Temp))>0,text(Name_BNAME_Temp)) as Name_BNAME,
+	  %KEY_SOLD_TO&'/'&%KEY_SALES_ORG&'/'&99&'/'&%KEY_DISTRIBUTION_CHANNEL as %KEY_ACTIVE_PAYER,
+	  if(match([SD Item Category] ,'TAS','ZNTS','ZTSZ','ZTAS'),'DropShip','Non-DropShip') as DropShip,
+	  	%KEY_MATERIAL &'/'& %KEY_SALES_ORG &'/'& %KEY_DIVISION as %KEY_CATALOG,
+	[Material Entered] &'/'& %KEY_SALES_ORG &'/'& %KEY_DIVISION as %KEY_CATALOG_MATENT,
+	 %KEY_MATERIAL&'/'& %KEY_PLANT as %KEY_MARC,
+right('0000000000'&%KEY_CONTACT_SOLD_TO,10) &'/'& %KEY_SOLD_TO &'/'& %KEY_SALES_ORG &'/'& %KEY_DIVISION &'/'& %KEY_DISTRIBUTION_CHANNEL as %KEY_SOLD_TO_CUSTOMER_DNA,
+right('0000000000'&%KEY_CONTACT_SHIP_TO,10) &'/'& %KEY_SHIP_TO &'/'& %KEY_SALES_ORG &'/'& %KEY_DIVISION &'/'& %KEY_DISTRIBUTION_CHANNEL as %KEY_SHIP_TO_CUSTOMER_DNA,
+
+if(if(isnull(%KEY_REJECTION_REASON) or trim(%KEY_REJECTION_REASON)='','No','Yes')='Yes' and Flag_OrdersType='1',0,1) as  [^Active_Rejected_Flag],
+%KEY_SALES_ORG&'/'&%KEY_DIVISION&'/'&%KEY_SOLD_TO&'/'&'AG' as %KEY_SALESTEAM_OUT,
+'V/Z001/' & %KEY_SALES_ORG & '/' & %KEY_DIVISION & '/' & If(isnum([Material Entered]),num([Material Entered]),[Material Entered]) & '/99991231' as %KEY_KOTD600,
+
+if(GATransactionID > 0, 'Yes','No') as [GA Transaction Flag]
+/* if(Old_GATransactionID>0, 'Yes', ApplyMap('Map_WPSNA',[Sales document_VBELN] ,'No')) as [Old GA Transaction Flag],
+if(len(GATransactionID)>0, 'Yes', ApplyMap('Map_WPSNA',[Sales document_VBELN] ,'No')) as [GA Transaction Flag] */
+
+Resident Fact;
+
+
+drop Fields Name_BNAME_Temp, [Cost Center];
+
+
+///$tab VBKD
+//RENAME Field [%KEY_VBAP] to %KEY_ZBI_VBKD_I;
+
+VBKD:
+LOAD %KEY_ZBI_VBKD_I, 
+[Your Reference_IHREZ],
+[Ship-to PO Number_BSTKD_E]
+FROM
+\\etl.ebi.insidebrady.com\repository$\04.TRANSACTION\SALES_ORDERS\DATA\SEGMENTS\ZBI_VBKD_I_FY_*.qvd
+(qvd)Where Exists(%KEY_VBAP,%KEY_ZBI_VBKD_I);
+
+//left join (Fact)
+Map_VBKD_I_Ref:
+Mapping
+Load
+%KEY_ZBI_VBKD_I, 
+[Your Reference_IHREZ]
+Resident VBKD where len(trim([Your Reference_IHREZ]))>0;
+
+Map_VBKD_I_Shipto:
+Mapping
+Load
+%KEY_ZBI_VBKD_I, 
+[Ship-to PO Number_BSTKD_E]
+Resident VBKD where len(trim([Ship-to PO Number_BSTKD_E]))>0;
+
+drop Table VBKD;
+
+//RENAME Field  %KEY_ZBI_VBKD_I to [%KEY_VBAP];
+//RENAME Field %KEY_VBAK to [Sales Document_VBELN];
+
+VBKD:
+LOAD [Sales Document_VBELN], 
+[Your Reference_IHREZ],
+[Ship-to PO Number_BSTKD_E]
+FROM
+\\etl.ebi.insidebrady.com\repository$\04.TRANSACTION\SALES_ORDERS\DATA\SEGMENTS\ZBI_VBKD_H_FY_*.qvd
+(qvd)Where Exists(%KEY_VBAK,[Sales Document_VBELN]);
+
+//left join (Fact)
+Map_VBKD_H_Ref:
+Mapping
+Load
+[Sales Document_VBELN], 
+[Your Reference_IHREZ]
+Resident VBKD;
+
+Map_VBKD_H_Shipto:
+Mapping
+Load
+[Sales Document_VBELN], 
+[Ship-to PO Number_BSTKD_E]
+Resident VBKD;
+
+drop Table VBKD;
+
+//RENAME Field  [Sales Document_VBELN] to %KEY_VBAK;
+
+left Join (Fact)
+LOAD Distinct %KEY_VBAP,
+	 ApplyMap('Map_VBKD_I_Ref',[%KEY_VBAP],applymap('Map_VBKD_H_Ref',%KEY_VBAK,null())) as [Your Reference_IHREZ],
+	 ApplyMap('Map_VBKD_I_Shipto',[%KEY_VBAP],applymap('Map_VBKD_H_Shipto',%KEY_VBAK,null())) as [Ship-to PO Number_BSTKD_E]
+	 
+Resident Fact;
+
+
+///$tab Lead From
+tmpPartners:
+LOAD * INLINE [
+Partner function_PARVW
+Y5
+];
+
+
+tmpLeadfrom:
+LEFT Keep (tmpPartners)
+LOAD 
+     [Partner function_PARVW], 
+     [Sales document_VBELN], 
+     [Item (SD)_POSNR],
+     Customer_KUNNR
+FROM 
+[\\etl.ebi.insidebrady.com\repository$\04.TRANSACTION\BILLING_DOCUMENTS\DATA\ZBI_VBPA_INV_H.qvd] (qvd)
+//[G:\97.Workarea\Others\AnthonyR\VBPA\DATA\VBPA.qvd] (qvd)  //from sap train ghos2016
+WHERE EXISTS (%KEY_VBAK,[Sales document_VBELN]);
+
+Drop Table tmpPartners;
+
+
+Left Join (Fact)
+Load Distinct
+	 [Sales document_VBELN] as %KEY_VBAK,
+	 Customer_KUNNR
+Resident tmpLeadfrom;
+
+Drop Table tmpLeadfrom;
+
+PartnerInformation:
+Left Join (Fact)
+LOAD 
+     Name_NAME1 as [Lead From], 
+     Customer_KUNNR
+FROM [\\etl.ebi.insidebrady.com\repository$\03.MASTER\CUSTOMER\DATA\ZBI_KNA1.qvd] (qvd)
+WHERE EXISTS (Customer_KUNNR);
+
+RENAME Field [Customer_KUNNR] to [Partner Information_KUNNR];
+
+///$tab Main 5
+
+
+
+store Fact into Fact.qvd;
+drop Table Fact;
+
+
+EXIT SCRIPT;
