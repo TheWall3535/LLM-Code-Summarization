@@ -21,16 +21,6 @@ def read_file(filename):
             rfile = file.read()
         return rfile
 
-params = dictionary()
-for line in read_file("GPT_AUTH (1).txt").split("\n"):
-    sep = line.split(" ")
-    params.add(sep[0],sep[1])
-
-openai.api_base = params['OPENAI_API_BASE']
-openai.api_key = params['OPENAI_API_KEY']
-openai.api_version = params["OPENAI_API_VERSION"]
-openai.api_type = params["API_TYPE"]
-
 class Summary(str):
     def __init__(self, summary, language, prompt):
         super().__init__()
