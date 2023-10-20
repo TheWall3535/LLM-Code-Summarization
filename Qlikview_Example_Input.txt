@@ -1,0 +1,23 @@
+glpcaFilter:
+LOAD 
+	%KEY_ENTITY
+FROM
+[G:\01.Repository\30.LOGICAL_LAYER\03.DIMENSIONS\ENTITY\DATA\Entity_Regional.qvd] (qvd)
+where Entity.Lvl_One = 'Americas & Asia';
+set vYearsBack = 1;
+for i = 0 to $(vYearsBack)
+	Let vYear = year(addmonths(today(), 5));
+	Let vYear = vYear - i;	
+uFact:
+LOAD %KEY_GLPCA_SALES,
+	%KEY_FACT_KEYS,
+	 %KEY_POSTING_DATE,  
+     %KEY_CURRNECY_BUDGET_CONVERSION,     
+     %KEY_ENTITY,
+     %KEY_PAYER,       
+     Fact.CustomerSales,  
+     Fact.Rebates
+FROM
+[\\etl.ebi.insidebrady.com\repository$\30.LOGICAL_LAYER\01.FACTS\GLPCA_SALES\DATA\Fact_GLPCA_Sales_$(vYear).qvd] (qvd)
+where exists (%KEY_ENTITY);
+Next
