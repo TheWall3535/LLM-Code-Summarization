@@ -2,7 +2,7 @@ import re
 import tiktoken
 
 class FileProcessor():
-'''Custom class which prepares Qlikview code for summarization. The code is automatically cleaned upon object instantiation, and the make_prompts() method segments the code into appropriately sized chunks'''
+
     def __init__(self, file, PROMPT_LENGTH = 1200, tokenizer_MODEL = 'gpt-3.5-turbo-16k'):
         self.file = file
         self.clean_file = self.read_and_clean()
@@ -36,8 +36,30 @@ class FileProcessor():
             line_counter += 1
             
         return sized_prompts
- 
-        def split_index(self):
+
+    
+    def count_tokens(self, Text):
+        encoding = tiktoken.encoding_for_model(self.tokenizer_MODEL)
+        tokens = encoding.encode(Text)
+        return len(tokens)
+
+    def read_and_clean(self):
+    
+        with open(self.file) as f:
+            lines = f.readlines()
+    
+        rawCode = [i.lower() for i in lines if (i != "\n" and not i.startswith("//"))]
+        result_string = ''.join(rawCode)
+        
+            #disregard multiline commented sections - unfeasible to not split into chunks that divide commented sections
+        for pattern in re.findall(r'/\*(.*?)\*/',result_string,flags = re.DOTALL):
+            pattern = r"/*"+pattern+r"*/"
+            result_string = re.sub(re.escape(pattern), '', result_string)
+        
+        return result_string
+
+
+    def split_index(self):
         # takes single file as string
         
         clean_code_sections = self.clean_file.split("\n")
@@ -81,28 +103,6 @@ class FileProcessor():
                 # print(algo_count,i,j)
                 
         return indicies
-
-    def count_tokens(self, Text):
-        encoding = tiktoken.encoding_for_model(self.tokenizer_MODEL)
-        tokens = encoding.encode(Text)
-        return len(tokens)
-
-    def read_and_clean(self):
-    
-        with open(self.file) as f:
-            lines = f.readlines()
-    
-        rawCode = [i.lower() for i in lines if (i != "\n" and not i.startswith("//"))]
-        result_string = ''.join(rawCode)
-        
-            #disregard multiline commented sections - unfeasible to not split into chunks that divide commented sections
-        for pattern in re.findall(r'/\*(.*?)\*/',result_string,flags = re.DOTALL):
-            pattern = r"/*"+pattern+r"*/"
-            result_string = re.sub(re.escape(pattern), '', result_string)
-        
-        return result_string
-
-
 
     
 
